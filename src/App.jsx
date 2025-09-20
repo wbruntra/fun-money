@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import { FaCog } from 'react-icons/fa'
 
 // LocalStorage keys
 const STORAGE_KEYS = {
@@ -44,7 +45,7 @@ function App() {
   const [spendingLog, setSpendingLog] = useState([])
   const [showSpendModal, setShowSpendModal] = useState(false)
   const [showFullLog, setShowFullLog] = useState(false)
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
   const [spendAmount, setSpendAmount] = useState('')
   const [spendNote, setSpendNote] = useState('')
   const [spendDate, setSpendDate] = useState('')
@@ -172,12 +173,6 @@ function App() {
     setStorageItem(STORAGE_KEYS.SPENDING_LOG, newSpendingLog)
   }
 
-  const addMarble = () => {
-    const newCount = marbles + 1
-    setMarbles(newCount)
-    setStorageItem(STORAGE_KEYS.MARBLES, newCount)
-  }
-
   const addMoney = () => {
     if (!addAmount || isNaN(parseFloat(addAmount))) {
       alert('Please enter a valid amount')
@@ -196,7 +191,7 @@ function App() {
     setMarbles(newMarbleCount)
     setStorageItem(STORAGE_KEYS.MARBLES, newMarbleCount)
     
-    setShowAddModal(false)
+    setShowSettingsModal(false)
     setAddAmount('')
   }
 
@@ -248,13 +243,15 @@ function App() {
       <header className="app-header">
         <h1>🫙 Fun Money</h1>
         <div className="stats">
-          <div className="stat">
-            <span className="stat-value">{marbles}</span>
-            <span className="stat-label">marbles available</span>
-          </div>
-          <div className="stat">
-            <span className="stat-value">{marbles * marbleValue}€</span>
-            <span className="stat-label">total fun budget</span>
+          <div className="stat combined-stat">
+            <div className="stat-main">
+              <span className="stat-value">{marbles}</span>
+              <span className="stat-label">marbles</span>
+            </div>
+            <div className="stat-sub">
+              <span className="budget-amount">{marbles * marbleValue}€</span>
+              <span className="budget-label">available</span>
+            </div>
           </div>
         </div>
       </header>
@@ -265,25 +262,13 @@ function App() {
             {Array.from({ length: Math.min(marbles, 100) }, (_, i) => (
               <div key={i} className="marble"></div>
             ))}
-            {marbles > 100 && (
-              <div className="marble-overflow">+{marbles - 100} more</div>
-            )}
+            {marbles > 100 && <div className="marble-overflow">+{marbles - 100} more</div>}
           </div>
         </div>
 
         <div className="controls">
-          <button 
-            className="spend-button"
-            onClick={openSpendModal}
-            disabled={marbles === 0}
-          >
+          <button className="spend-button" onClick={openSpendModal} disabled={marbles === 0}>
             💸 Spend Money
-          </button>
-          <button 
-            className="add-button"
-            onClick={() => setShowAddModal(true)}
-          >
-            ➕ Add Money
           </button>
         </div>
       </main>
@@ -296,11 +281,13 @@ function App() {
               <div key={entry.id} className="spending-item">
                 <div className="spending-amount">{entry.amount}€</div>
                 <div className="spending-details">
-                  <div className="spending-marbles">{entry.marbles} marble{entry.marbles !== 1 ? 's' : ''}</div>
+                  <div className="spending-marbles">
+                    {entry.marbles} marble{entry.marbles !== 1 ? 's' : ''}
+                  </div>
                   {entry.note && <div className="spending-note">"{entry.note}"</div>}
                   <div className="spending-date">{entry.date}</div>
                 </div>
-                <button 
+                <button
                   className="delete-button"
                   onClick={() => deleteSpendingEntry(entry.id)}
                   title="Delete this entry"
@@ -312,16 +299,25 @@ function App() {
           </div>
           {spendingLog.length > 0 && (
             <div className="log-button-container">
-              <button 
-                className="log-button"
-                onClick={() => setShowFullLog(true)}
-              >
+              <button className="log-button" onClick={() => setShowFullLog(true)}>
                 📋 View Full Log
               </button>
             </div>
           )}
         </section>
       )}
+
+      <div className="settings-icon-container">
+        <button
+          className="settings-icon-button"
+          onClick={() => setShowSettingsModal(true)}
+          title="Settings"
+        >
+          <FaCog size={24} />
+        </button>
+      </div>
+
+      <FaCog size={24} />
 
       {showSpendModal && (
         <div className="modal-overlay" onClick={() => setShowSpendModal(false)}>
@@ -351,10 +347,14 @@ function App() {
                 />
                 <span className="currency">€</span>
               </label>
-              
+
               {spendAmount && !isNaN(parseFloat(spendAmount)) && (
                 <div className="marble-cost">
-                  This will use <strong>{Math.ceil(parseFloat(spendAmount) / marbleValue)} marble{Math.ceil(parseFloat(spendAmount) / marbleValue) !== 1 ? 's' : ''}</strong>
+                  This will use{' '}
+                  <strong>
+                    {Math.ceil(parseFloat(spendAmount) / marbleValue)} marble
+                    {Math.ceil(parseFloat(spendAmount) / marbleValue) !== 1 ? 's' : ''}
+                  </strong>
                 </div>
               )}
 
@@ -381,58 +381,12 @@ function App() {
         </div>
       )}
 
-      {showAddModal && (
-        <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>💰 Add Money</h3>
-            <div className="modal-form">
-              <label>
-                How much money do you want to add?
-                <input
-                  type="number"
-                  value={addAmount}
-                  onChange={(e) => setAddAmount(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  autoFocus
-                />
-                <span className="currency">€</span>
-              </label>
-              
-              {addAmount && !isNaN(parseFloat(addAmount)) && (
-                <div className="marble-cost">
-                  This will add <strong>{Math.floor(parseFloat(addAmount) / marbleValue)} marble{Math.floor(parseFloat(addAmount) / marbleValue) !== 1 ? 's' : ''}</strong>
-                  {parseFloat(addAmount) % marbleValue !== 0 && (
-                    <div className="remainder-note">
-                      (Remainder of {(parseFloat(addAmount) % marbleValue).toFixed(2)}€ will be ignored)
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="modal-buttons">
-                <button onClick={() => setShowAddModal(false)} className="cancel-button">
-                  Cancel
-                </button>
-                <button onClick={addMoney} className="confirm-button">
-                  Add Marbles
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showFullLog && (
         <div className="modal-overlay" onClick={() => setShowFullLog(false)}>
           <div className="full-log-modal" onClick={(e) => e.stopPropagation()}>
             <div className="full-log-header">
               <h3>📋 Complete Spending Log</h3>
-              <button 
-                className="close-button"
-                onClick={() => setShowFullLog(false)}
-              >
+              <button className="close-button" onClick={() => setShowFullLog(false)}>
                 ✕
               </button>
             </div>
@@ -445,11 +399,13 @@ function App() {
                     <div key={entry.id} className="spending-item">
                       <div className="spending-amount">{entry.amount}€</div>
                       <div className="spending-details">
-                        <div className="spending-marbles">{entry.marbles} marble{entry.marbles !== 1 ? 's' : ''}</div>
+                        <div className="spending-marbles">
+                          {entry.marbles} marble{entry.marbles !== 1 ? 's' : ''}
+                        </div>
                         {entry.note && <div className="spending-note">"{entry.note}"</div>}
                         <div className="spending-date">{entry.date}</div>
                       </div>
-                      <button 
+                      <button
                         className="delete-button"
                         onClick={() => deleteSpendingEntry(entry.id)}
                         title="Delete this entry"
@@ -460,6 +416,64 @@ function App() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSettingsModal && (
+        <div className="modal-overlay" onClick={() => setShowSettingsModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>⚙️ Settings</h3>
+            <div className="modal-form">
+              <div className="settings-section">
+                <h4>💰 Add Money</h4>
+                <label>
+                  How much money do you want to add?
+                  <input
+                    type="number"
+                    value={addAmount}
+                    onChange={(e) => setAddAmount(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    autoFocus
+                  />
+                  <span className="currency">€</span>
+                </label>
+
+                {addAmount && !isNaN(parseFloat(addAmount)) && (
+                  <div className="marble-cost">
+                    This will add{' '}
+                    <strong>
+                      {Math.floor(parseFloat(addAmount) / marbleValue)} marble
+                      {Math.floor(parseFloat(addAmount) / marbleValue) !== 1 ? 's' : ''}
+                    </strong>
+                    {parseFloat(addAmount) % marbleValue !== 0 && (
+                      <div className="remainder-note">
+                        (Remainder of {(parseFloat(addAmount) % marbleValue).toFixed(2)}€ will be
+                        ignored)
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="settings-buttons">
+                  <button
+                    onClick={addMoney}
+                    className="confirm-button"
+                    disabled={!addAmount || isNaN(parseFloat(addAmount))}
+                  >
+                    Add Marbles
+                  </button>
+                </div>
+              </div>
+
+              <div className="modal-buttons">
+                <button onClick={() => setShowSettingsModal(false)} className="cancel-button">
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

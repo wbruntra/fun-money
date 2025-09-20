@@ -1,13 +1,8 @@
-/* Reset and base styles */
-* {
-  box-sizing: border-box;
-}
-
 #root {
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
 }
@@ -36,7 +31,6 @@
 .stats {
   display: flex;
   justify-content: center;
-  gap: 2rem;
   margin-top: 1rem;
 }
 
@@ -51,15 +45,46 @@
   min-width: 120px;
 }
 
+.stat.combined-stat {
+  padding: 1.5rem;
+  min-width: 200px;
+}
+
+.stat-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .stat-value {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0.25rem;
 }
 
 .stat-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   opacity: 0.9;
+}
+
+.stat-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding-top: 0.75rem;
+}
+
+.budget-amount {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.budget-label {
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 
 /* Marble container */
@@ -170,23 +195,18 @@
 /* Controls */
 .controls {
   display: flex;
-  gap: 1rem;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
-.spend-button, .add-button {
-  padding: 12px 24px;
+.spend-button {
+  padding: 15px 30px;
   border: none;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.spend-button {
   background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
   color: white;
 }
@@ -199,16 +219,6 @@
 .spend-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.add-button {
-  background: linear-gradient(135deg, #4ecdc4, #45b7aa);
-  color: white;
-}
-
-.add-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
 }
 
 /* Modal */
@@ -579,6 +589,66 @@
   padding: 3rem;
 }
 
+.settings-icon-button {
+  background: rgba(102, 126, 234, 0.1) !important;
+  border: 2px solid rgba(102, 126, 234, 0.3) !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 1.5rem !important;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+}
+
+.settings-icon-button:hover {
+  background: rgba(102, 126, 234, 0.2) !important;
+  border-color: rgba(102, 126, 234, 0.5) !important;
+  transform: scale(1.1);
+}
+
+.settings-icon-button svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: #667eea !important;
+}
+
+/* Settings modal */
+.settings-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.settings-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-section h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.settings-buttons {
+  margin-top: 1rem;
+}
+
+.settings-buttons .confirm-button {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.settings-buttons .confirm-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Responsive design */
 @media (max-width: 600px) {
   #root {
@@ -593,18 +663,38 @@
     font-size: 2rem;
   }
   
-  .stats {
-    flex-direction: column;
-    gap: 1rem;
+  .stat.combined-stat {
+    min-width: 100%;
+    padding: 1rem;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
   }
   
-  .controls {
-    flex-direction: column;
-    width: 100%;
+  .stat-main {
+    margin-bottom: 0;
+    margin-right: 0;
   }
   
-  .spend-button, .add-button {
+  .stat-sub {
+    border-top: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    padding-top: 0;
+    padding-left: 2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+  }
+  
+  .budget-amount {
+    font-size: 1.1rem;
+  }
+  
+  .spend-button {
     width: 100%;
+    max-width: 300px;
   }
   
   .jar {
