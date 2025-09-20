@@ -316,9 +316,7 @@ function App() {
           <FaCog size={24} />
         </button>
       </div>
-
-      <FaCog size={24} />
-
+      
       {showSpendModal && (
         <div className="modal-overlay" onClick={() => setShowSpendModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
