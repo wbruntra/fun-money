@@ -10,24 +10,24 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Fun Money',
-        short_name: 'FunMoney',
-        description: 'Track your fun money and spending as marbles!',
+        name: 'Fun Money – Marble Budget Tracker',
+        short_name: 'Fun Money',
+        description: 'A playful PWA for tracking your personal fun budget using marbles. Log spending, add funds, and visualize your available budget!',
         start_url: '/fun-money/',
         display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#41D1FF',
+        background_color: '#e3ecf7',
+        theme_color: '#3a7bb7',
         icons: [
           {
-            src: '/fun-money/vite.svg',
+            src: '/fun-money/icon-192.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: '/fun-money/vite.svg',
+            src: '/fun-money/icon-512.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable'
           }
         ]
