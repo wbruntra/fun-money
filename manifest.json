@@ -1,11 +1,11 @@
 {
-  "name": "Fun Money",
-  "short_name": "FunMoney",
-  "description": "Track your fun money and spending as marbles!",
+  "name": "Fun Money – Marble Budget Tracker",
+  "short_name": "Fun Money",
+  "description": "A playful PWA for tracking your personal fun budget using marbles. Log spending, add funds, and visualize your available budget!",
   "start_url": "/fun-money/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#41D1FF",
+  "background_color": "#e3ecf7",
+  "theme_color": "#3a7bb7",
   "icons": [
     {
       "src": "/fun-money/icon-192.png",
