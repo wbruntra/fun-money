@@ -1,204 +1,61 @@
-import { useState, useEffect } from 'react'
 import './App.css'
 import { FaCog } from 'react-icons/fa'
-
-// LocalStorage keys
-const STORAGE_KEYS = {
-  MARBLES: 'funMoney_marbles',
-  DAILY_BUDGET: 'funMoney_dailyBudget',
-  LAST_VISIT: 'funMoney_lastVisit',
-  SPENDING_LOG: 'funMoney_spendingLog',
-  START_DATE: 'funMoney_startDate'
-}
-
-// Utility functions
-const getStorageItem = (key, defaultValue) => {
-  try {
-    const item = localStorage.getItem(key)
-    return item ? JSON.parse(item) : defaultValue
-  } catch {
-    return defaultValue
-  }
-}
-
-const setStorageItem = (key, value) => {
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch (error) {
-    console.error('Failed to save to localStorage:', error)
-  }
-}
-
-const getDateString = (date = new Date()) => {
-  return date.toISOString().split('T')[0]
-}
-
-const daysBetween = (date1, date2) => {
-  const oneDay = 24 * 60 * 60 * 1000
-  return Math.floor((date2 - date1) / oneDay)
-}
+import { useAppState } from './hooks/useAppState'
+import { useAppLogic } from './hooks/useAppLogic'
+import { getDateString } from './utils'
 
 function App() {
-  const [marbles, setMarbles] = useState(0)
-  const [dailyBudget] = useState(8) // 8€ per day (2 marbles × 4€ each)
-  const [marbleValue] = useState(4) // 4€ per marble
-  const [spendingLog, setSpendingLog] = useState([])
-  const [showSpendModal, setShowSpendModal] = useState(false)
-  const [showFullLog, setShowFullLog] = useState(false)
-  const [showSettingsModal, setShowSettingsModal] = useState(false)
-  const [spendAmount, setSpendAmount] = useState('')
-  const [spendNote, setSpendNote] = useState('')
-  const [spendDate, setSpendDate] = useState('')
-  const [addAmount, setAddAmount] = useState('')
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [showSetup, setShowSetup] = useState(false)
-  const [initialAmount, setInitialAmount] = useState('')
+  // Use custom hooks for state and logic management
+  const state = useAppState()
+  const logic = useAppLogic(state)
 
-  // Initialize app data
-  useEffect(() => {
-    const savedMarbles = getStorageItem(STORAGE_KEYS.MARBLES, null)
-    const savedStartDate = getStorageItem(STORAGE_KEYS.START_DATE, null)
-    const savedSpendingLog = getStorageItem(STORAGE_KEYS.SPENDING_LOG, [])
-    const lastVisit = getStorageItem(STORAGE_KEYS.LAST_VISIT, null)
-    
-    setSpendingLog(savedSpendingLog)
+  // Destructure state for easier access in JSX
+  const {
+    marbles,
+    dailyBudget,
+    marbleValue,
+    spendingLog,
+    isInitialized,
+    showSetup,
+    showSpendModal,
+    showFullLog,
+    showSettingsModal,
+    showSettingsConfig,
+    spendAmount,
+    spendNote,
+    spendDate,
+    addAmount,
+    initialAmount,
+    setupMarbleValue,
+    setupDailyBudget,
+    newDailyBudget,
+    newMarbleValue,
+    setShowFullLog,
+    setShowSettingsModal,
+    setShowSpendModal,
+    setShowSettingsConfig,
+    setSpendDate,
+    setSpendAmount,
+    setSpendNote,
+    setAddAmount,
+    setInitialAmount,
+    setSetupMarbleValue,
+    setSetupDailyBudget,
+    setNewDailyBudget,
+    setNewMarbleValue
+  } = state
 
-    if (savedMarbles === null || savedStartDate === null) {
-      // First time setup
-      setShowSetup(true)
-      return
-    }
-
-    setIsInitialized(true)
-    
-    // Calculate marbles to add based on days since last visit
-    const today = new Date()
-    const todayString = getDateString(today)
-    
-    let currentMarbles = savedMarbles
-    
-    if (lastVisit && lastVisit !== todayString) {
-      const lastVisitDate = new Date(lastVisit)
-      const daysToAdd = daysBetween(lastVisitDate, today)
-      
-      if (daysToAdd > 0) {
-        // Add 2 marbles per day (8€ daily budget ÷ 4€ per marble)
-        currentMarbles += daysToAdd * 2
-        setStorageItem(STORAGE_KEYS.MARBLES, currentMarbles)
-      }
-    }
-    
-    setMarbles(currentMarbles)
-    setStorageItem(STORAGE_KEYS.LAST_VISIT, todayString)
-  }, [])
-
-  const initializeApp = () => {
-    if (!initialAmount || isNaN(parseFloat(initialAmount))) {
-      alert('Please enter a valid initial amount')
-      return
-    }
-
-    const startingMarbles = Math.floor(parseFloat(initialAmount) / marbleValue)
-    const today = getDateString()
-    
-    setStorageItem(STORAGE_KEYS.MARBLES, startingMarbles)
-    setStorageItem(STORAGE_KEYS.START_DATE, today)
-    setStorageItem(STORAGE_KEYS.LAST_VISIT, today)
-    setStorageItem(STORAGE_KEYS.DAILY_BUDGET, dailyBudget)
-    
-    setMarbles(startingMarbles)
-    setIsInitialized(true)
-    setShowSetup(false)
-    setInitialAmount('')
-  }
-
-  const spendMarbles = () => {
-    if (!spendAmount || isNaN(parseFloat(spendAmount))) {
-      alert('Please enter a valid spending amount')
-      return
-    }
-
-    if (!spendDate) {
-      alert('Please select a date for this spending')
-      return
-    }
-
-    const amount = parseFloat(spendAmount)
-    const marblesToSpend = Math.ceil(amount / marbleValue)
-    
-    if (marblesToSpend > marbles) {
-      alert(`You don't have enough marbles! You need ${marblesToSpend} but only have ${marbles}.`)
-      return
-    }
-
-    const newMarbleCount = marbles - marblesToSpend
-    const newLogEntry = {
-      id: Date.now() + Math.random(), // Unique ID for deletion
-      date: spendDate,
-      amount: amount,
-      marbles: marblesToSpend,
-      note: spendNote.trim() || null,
-      timestamp: Date.now()
-    }
-
-    setMarbles(newMarbleCount)
-    const newSpendingLog = [newLogEntry, ...spendingLog].sort((a, b) => new Date(b.date) - new Date(a.date))
-    setSpendingLog(newSpendingLog)
-    
-    setStorageItem(STORAGE_KEYS.MARBLES, newMarbleCount)
-    setStorageItem(STORAGE_KEYS.SPENDING_LOG, newSpendingLog)
-    
-    setShowSpendModal(false)
-    setSpendAmount('')
-    setSpendNote('')
-    setSpendDate('')
-  }
-
-  const deleteSpendingEntry = (entryId) => {
-    const entry = spendingLog.find(e => e.id === entryId)
-    if (!entry) return
-
-    if (!confirm(`Delete spending entry: ${entry.amount}€${entry.note ? ` (${entry.note})` : ''}?`)) {
-      return
-    }
-
-    // Add marbles back
-    const newMarbleCount = marbles + entry.marbles
-    const newSpendingLog = spendingLog.filter(e => e.id !== entryId)
-
-    setMarbles(newMarbleCount)
-    setSpendingLog(newSpendingLog)
-    
-    setStorageItem(STORAGE_KEYS.MARBLES, newMarbleCount)
-    setStorageItem(STORAGE_KEYS.SPENDING_LOG, newSpendingLog)
-  }
-
-  const addMoney = () => {
-    if (!addAmount || isNaN(parseFloat(addAmount))) {
-      alert('Please enter a valid amount')
-      return
-    }
-
-    const amount = parseFloat(addAmount)
-    const marblesToAdd = Math.floor(amount / marbleValue)
-    
-    if (marblesToAdd === 0) {
-      alert(`Amount too small! You need at least ${marbleValue}€ to add 1 marble.`)
-      return
-    }
-
-    const newMarbleCount = marbles + marblesToAdd
-    setMarbles(newMarbleCount)
-    setStorageItem(STORAGE_KEYS.MARBLES, newMarbleCount)
-    
-    setShowSettingsModal(false)
-    setAddAmount('')
-  }
-
-  const openSpendModal = () => {
-    setSpendDate(getDateString()) // Default to today
-    setShowSpendModal(true)
-  }
+  // Destructure logic functions
+  const {
+    initializeApp,
+    spendMarbles,
+    deleteSpendingEntry,
+    addMoney,
+    openSpendModal,
+    openSettingsConfig,
+    saveSettings,
+    reinitializeApp
+  } = logic
 
   if (showSetup) {
     return (
@@ -218,11 +75,38 @@ function App() {
             />
             <span className="currency">€</span>
           </label>
+
+          <label>
+            What should be the value of each marble?
+            <input
+              type="number"
+              value={setupMarbleValue}
+              onChange={(e) => setSetupMarbleValue(e.target.value)}
+              placeholder="4.00"
+              min="0.01"
+              step="0.01"
+            />
+            <span className="currency">€</span>
+          </label>
+
+          <label>
+            How much money should be added daily?
+            <input
+              type="number"
+              value={setupDailyBudget}
+              onChange={(e) => setSetupDailyBudget(e.target.value)}
+              placeholder="8.00"
+              min="0.01"
+              step="0.01"
+            />
+            <span className="currency">€</span>
+          </label>
+
           <p className="budget-info">
-            Daily budget: {dailyBudget}€ per day ({dailyBudget / marbleValue} marbles × {marbleValue}€ each)
-            {initialAmount && !isNaN(parseFloat(initialAmount)) && (
+            Daily budget: {setupDailyBudget}€ per day ({Math.floor(parseFloat(setupDailyBudget || 0) / parseFloat(setupMarbleValue || 1))} marbles × {setupMarbleValue}€ each)
+            {initialAmount && !isNaN(parseFloat(initialAmount)) && setupMarbleValue && !isNaN(parseFloat(setupMarbleValue)) && (
               <span className="marble-preview">
-                <br />This will give you <strong>{Math.floor(parseFloat(initialAmount) / marbleValue)} marbles</strong> to start
+                <br />This will give you <strong>{Math.floor(parseFloat(initialAmount) / parseFloat(setupMarbleValue))} marbles</strong> to start
               </span>
             )}
           </p>
@@ -467,6 +351,24 @@ function App() {
                 </div>
               </div>
 
+              <div className="settings-section">
+                <h4>⚙️ Configure App</h4>
+                <div className="settings-info">
+                  <p><strong>Current Settings:</strong></p>
+                  <p>Daily Budget: {dailyBudget}€ ({Math.floor(dailyBudget / marbleValue)} marbles × {marbleValue}€ each)</p>
+                  <p>Marble Value: {marbleValue}€ each</p>
+                </div>
+
+                <div className="settings-buttons">
+                  <button onClick={openSettingsConfig} className="secondary-button">
+                    Change Settings
+                  </button>
+                  <button onClick={reinitializeApp} className="danger-button">
+                    Reinitialize App
+                  </button>
+                </div>
+              </div>
+
               <div className="modal-buttons">
                 <button onClick={() => setShowSettingsModal(false)} className="cancel-button">
                   Close
@@ -476,8 +378,62 @@ function App() {
           </div>
         </div>
       )}
+
+      {showSettingsConfig && (
+        <div className="modal-overlay" onClick={() => setShowSettingsConfig(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>⚙️ Configure Settings</h3>
+            <div className="modal-form">
+              <div className="settings-section">
+                <label>
+                  Daily Budget (€)
+                  <input
+                    type="number"
+                    value={newDailyBudget}
+                    onChange={(e) => setNewDailyBudget(e.target.value)}
+                    placeholder="8.00"
+                    min="0.01"
+                    step="0.01"
+                  />
+                  <span className="currency">€</span>
+                </label>
+
+                <label>
+                  Marble Value (€)
+                  <input
+                    type="number"
+                    value={newMarbleValue}
+                    onChange={(e) => setNewMarbleValue(e.target.value)}
+                    placeholder="4.00"
+                    min="0.01"
+                    step="0.01"
+                  />
+                  <span className="currency">€</span>
+                </label>
+
+                {newDailyBudget && newMarbleValue && !isNaN(parseFloat(newDailyBudget)) && !isNaN(parseFloat(newMarbleValue)) && (
+                  <div className="settings-preview">
+                    <p><strong>Preview:</strong></p>
+                    <p>Daily Budget: {parseFloat(newDailyBudget)}€ ({Math.floor(parseFloat(newDailyBudget) / parseFloat(newMarbleValue))} marbles × {parseFloat(newMarbleValue)}€ each)</p>
+                    <p>Current Money: {marbles * marbleValue}€ ({marbles} marbles) - <em>Will be preserved</em></p>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-buttons">
+                <button onClick={() => setShowSettingsConfig(false)} className="cancel-button">
+                  Cancel
+                </button>
+                <button onClick={saveSettings} className="confirm-button">
+                  Save Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
-
 export default App

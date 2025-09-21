@@ -649,6 +649,73 @@
   cursor: not-allowed;
 }
 
+.secondary-button {
+  background: linear-gradient(135deg, #4ecdc4, #45b7aa);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.secondary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+.danger-button {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.danger-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.settings-info {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.settings-info p {
+  margin: 0.25rem 0;
+}
+
+.settings-preview {
+  background: #e8f4f8;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  border-left: 4px solid #667eea;
+}
+
+.settings-preview p {
+  margin: 0.25rem 0;
+}
+
+.settings-preview strong {
+  color: #333;
+}
+
 /* Responsive design */
 @media (max-width: 600px) {
   #root {
