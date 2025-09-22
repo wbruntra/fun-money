@@ -71,7 +71,7 @@ function App() {
               onChange={(e) => setInitialAmount(e.target.value)}
               placeholder="e.g., 240"
               min="0"
-              step="0.01"
+              step="1"
             />
             <span className="currency">€</span>
           </label>
@@ -82,9 +82,9 @@ function App() {
               type="number"
               value={setupMarbleValue}
               onChange={(e) => setSetupMarbleValue(e.target.value)}
-              placeholder="4.00"
-              min="0.01"
-              step="0.01"
+              placeholder="4"
+              min="1"
+              step="1"
             />
             <span className="currency">€</span>
           </label>
@@ -95,9 +95,9 @@ function App() {
               type="number"
               value={setupDailyBudget}
               onChange={(e) => setSetupDailyBudget(e.target.value)}
-              placeholder="8.00"
-              min="0.01"
-              step="0.01"
+              placeholder="8"
+              min="1"
+              step="1"
             />
             <span className="currency">€</span>
           </label>
@@ -222,9 +222,9 @@ function App() {
                   type="number"
                   value={spendAmount}
                   onChange={(e) => setSpendAmount(e.target.value)}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
+                  placeholder="0"
+                  min="1"
+                  step="1"
                   autoFocus
                 />
                 <span className="currency">€</span>
